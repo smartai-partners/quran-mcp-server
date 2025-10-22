@@ -10,6 +10,48 @@ This is a Model Context Protocol (MCP) server generated from the [OpenAPI specif
 
 The following endpoints from the API have been made available as tools, that LLMs can use via compatible clients.
 
+### Comprehensive Explanation (Recommended)
+
+**NEW: The Most Efficient Way to Understand Quran**
+
+The `explanation` tool provides the most efficient and comprehensive way to understand Quranic verses by combining multiple API calls into a single optimized request:
+
+* **explanation** - Get comprehensive Quran explanation with verses, translations, and tafsirs
+  - Fetches Arabic text, multiple translations, and scholarly explanations (tafsirs) in a single API call
+  - Supports multiple reference types: verse key, chapter, page, juz, hizb, or rub el hizb
+  - Optional context verses (surrounding verses) for better understanding
+  - Smart caching for frequently accessed explanations
+  - Typically requires only 1-2 API calls vs 3+ separate calls for the same information
+
+**Example Usage:**
+```json
+{
+  "verse_key": "2:255",
+  "translations": "131,20",
+  "tafsirs": "169",
+  "language": "en"
+}
+```
+
+This single call retrieves:
+- Original Arabic text of Ayat al-Kursi (2:255)
+- Two English translations (Clear Quran and Sahih International)
+- Tafsir Ibn Kathir explanation
+- All in one optimized request
+
+**Popular Translation IDs:**
+- 131: Dr. Mustafa Khattab, The Clear Quran
+- 20: Sahih International
+- 85: Abdul Haleem
+- 22: Pickthall
+- 19: Yusuf Ali
+
+**Popular Tafsir IDs:**
+- 169: Tafsir Ibn Kathir (English)
+- 93: Tafsir al-Jalalayn
+
+Use the `translations` and `tafsirs` tools to get the complete list of available resources.
+
 ### Chapters
 * GET /chapters - List Chapters
 * GET /chapters/{id} - Get Chapter

@@ -35,6 +35,7 @@ const {
   tafsirsSchemas,
   audioSchemas,
   languagesSchemas,
+  explanationSchemas,
 } = require('./schemas');
 
 // Import handlers
@@ -59,6 +60,7 @@ const {
   handleChapterReciters,
   handleRecitationStyles,
   handleLanguages,
+  handleExplanation,
 } = require('./handlers');
 
 // Import utilities
@@ -120,6 +122,12 @@ server.setRequestHandler(PromptsGetRequestSchema, async (request: any) => {
  */
 server.setRequestHandler(ListToolsRequestSchema, async (request: any) => ({
   tools: [
+    {
+      name: ApiTools.explanation,
+      description: "Get comprehensive Quran explanation with verses, translations, and tafsirs in a single optimized request. This is the most efficient way to understand Quranic verses.",
+      inputSchema: zodToJsonSchema(explanationSchemas.explanation),
+      examples: toolExamples['explanation'],
+    },
     {
       name: ApiTools.list_chapters,
       description: "List Chapters",
@@ -253,6 +261,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     });
 
     switch (request.params.name) {
+      // Explanation tool (comprehensive Quran explanation)
+      case ApiTools.explanation:
+        return await handleExplanation(request.params.arguments);
+
       // Chapter-related tools
       case ApiTools.list_chapters:
         return await handleListChapters(request.params.arguments);

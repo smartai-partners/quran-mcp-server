@@ -9,6 +9,146 @@
  * Tool examples organized by tool name
  */
 export const toolExamples = {
+  // Explanation examples (comprehensive Quran explanation)
+  'explanation': [
+    {
+      description: "Get comprehensive explanation for Ayat al-Kursi (2:255) with multiple translations and tafsir",
+      parameters: {
+        verse_key: "2:255",
+        translations: "131,20",
+        tafsirs: "169",
+        language: "en"
+      },
+      result: {
+        success: true,
+        message: "Explanation retrieved successfully",
+        data: {
+          summary: "Retrieved 1 verse(s) from Verse 2:255 from Al-Baqarah with 2 translation(s) (IDs: 131, 20) and 1 tafsir(s) (IDs: 169) using 1 optimized API call(s).",
+          metadata: {
+            verse_reference: "Verse 2:255",
+            chapter_name: "Al-Baqarah",
+            total_verses: 1,
+            translations_included: ["131", "20"],
+            tafsirs_included: ["169"],
+            context_included: false,
+            api_calls_made: 1
+          },
+          verses: [
+            {
+              verse_number: 1,
+              verse_key: "2:255",
+              text_uthmani: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+              translations: [
+                {
+                  id: 131,
+                  name: "Dr. Mustafa Khattab, The Clear Quran",
+                  text: "Allah! There is no god worthy of worship except Him, the Ever-Living, All-Sustaining.",
+                  language: "english"
+                },
+                {
+                  id: 20,
+                  name: "Sahih International",
+                  text: "Allah - there is no deity except Him, the Ever-Living, the Sustainer of existence.",
+                  language: "english"
+                }
+              ],
+              tafsirs: [
+                {
+                  id: 169,
+                  name: "Tafsir Ibn Kathir",
+                  text: "Allah's statement: (Allah! La ilaha illa Huwa (none has the right to be worshipped but He), Al-Hayyul-Qayyum) meaning, He is the One, there is no deity worthy of worship except Him...",
+                  language: "english"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      description: "Get explanation for entire Al-Fatihah (Chapter 1) with translation and context",
+      parameters: {
+        chapter_number: "1",
+        translations: "131",
+        language: "en"
+      },
+      result: {
+        success: true,
+        message: "Explanation retrieved successfully",
+        data: {
+          summary: "Retrieved 7 verse(s) from Chapter 1 from Al-Fatihah with 1 translation(s) (IDs: 131) using 1 optimized API call(s).",
+          metadata: {
+            verse_reference: "Chapter 1",
+            chapter_name: "Al-Fatihah",
+            total_verses: 7,
+            translations_included: ["131"],
+            tafsirs_included: [],
+            context_included: false,
+            api_calls_made: 1
+          },
+          verses: [
+            {
+              verse_number: 1,
+              verse_key: "1:1",
+              text_uthmani: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+              translations: [
+                {
+                  id: 131,
+                  name: "Dr. Mustafa Khattab, The Clear Quran",
+                  text: "In the Name of Allah - the Most Compassionate, Most Merciful.",
+                  language: "english"
+                }
+              ]
+            }
+            // Additional verses truncated for brevity
+          ]
+        }
+      }
+    },
+    {
+      description: "Get verse with context (surrounding verses)",
+      parameters: {
+        verse_key: "112:1",
+        translations: "131",
+        include_context: true,
+        context_verses: 2,
+        language: "en"
+      },
+      result: {
+        success: true,
+        message: "Explanation retrieved successfully",
+        data: {
+          summary: "Retrieved 4 verse(s) from Verse 112:1 from Al-Ikhlas with 1 translation(s) (IDs: 131) including context verses using 2 optimized API call(s).",
+          metadata: {
+            verse_reference: "Verse 112:1",
+            chapter_name: "Al-Ikhlas",
+            total_verses: 4,
+            translations_included: ["131"],
+            tafsirs_included: [],
+            context_included: true,
+            api_calls_made: 2
+          },
+          verses: [
+            {
+              verse_number: 1,
+              verse_key: "112:1",
+              text_uthmani: "قُلْ هُوَ اللَّهُ أَحَدٌ",
+              translations: [
+                {
+                  id: 131,
+                  name: "Dr. Mustafa Khattab, The Clear Quran",
+                  text: "Say, O Prophet, He is Allah—One and Indivisible.",
+                  language: "english"
+                }
+              ]
+            }
+            // Additional context verses truncated for brevity
+          ]
+        }
+      }
+    }
+  ],
+
   // Chapter-related examples
   'list-chapters': [
     {

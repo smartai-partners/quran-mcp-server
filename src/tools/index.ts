@@ -47,6 +47,7 @@ export const ApiTools = {
   QURAN_verses_code_v1: "QURAN-verses-code_v1",
   QURAN_verses_code_v2: "QURAN-verses-code_v2",
   search: "search",
+  explanation: "explanation",
 } as const;
 
 // Create a type from the object values
@@ -56,6 +57,9 @@ export type ApiToolsType = typeof ApiTools[keyof typeof ApiTools];
  * Group tools by category for better organization
  */
 export const ToolCategories = {
+  explanation: [
+    ApiTools.explanation,
+  ],
   chapters: [
     ApiTools.list_chapters,
     ApiTools.GET_chapter,

@@ -33,3 +33,6 @@ export {
   handleRecitationStyles,
   handleLanguages
 } from './resources';
+
+// Explanation handler (comprehensive Quran explanation)
+export { handleExplanation } from './explanation';
