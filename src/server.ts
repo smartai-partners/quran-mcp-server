@@ -68,6 +68,9 @@ const { createErrorResponse } = require('./utils/error-handler');
 // Import examples
 const { toolExamples } = require('./examples');
 
+// Import prompts
+const { prompts, getPromptById, getPromptMessage } = require('./prompts');
+
 // Define custom request schemas for prompts methods using Zod
 const PromptsListRequestSchema = z.object({
   method: z.literal('prompts/list'),
@@ -100,9 +103,16 @@ const server = new Server(
  * Handle prompts/list method
  */
 server.setRequestHandler(PromptsListRequestSchema, async (request: any) => {
-  console.error("Handling prompts/list request");
+  verboseLog('request', {
+    method: 'prompts/list'
+  });
+
   return {
-    prompts: [] // Return an empty array of prompts
+    prompts: prompts.map((p: any) => ({
+      name: p.id,
+      description: p.description,
+      arguments: p.arguments || []
+    }))
   };
 });
 
@@ -110,9 +120,41 @@ server.setRequestHandler(PromptsListRequestSchema, async (request: any) => {
  * Handle prompts/get method
  */
 server.setRequestHandler(PromptsGetRequestSchema, async (request: any) => {
-  console.error("Handling prompts/get request for id:", request.params.id);
-  // Since we don't have any prompts, we'll return a not found error
-  throw new McpError(ErrorCode.NotFound, `Prompt with id ${request.params.id} not found`);
+  verboseLog('request', {
+    method: 'prompts/get',
+    id: request.params.id
+  });
+
+  const promptId = request.params.name || request.params.id;
+  const prompt = getPromptById(promptId);
+
+  if (!prompt) {
+    throw new McpError(ErrorCode.NotFound, `Prompt with id ${promptId} not found`);
+  }
+
+  try {
+    // Get the prompt message with provided arguments
+    const args = request.params.arguments || {};
+    const message = getPromptMessage(promptId, args);
+
+    return {
+      description: prompt.description,
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: message
+          }
+        }
+      ]
+    };
+  } catch (error) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      `Error generating prompt: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 });
 
 /**

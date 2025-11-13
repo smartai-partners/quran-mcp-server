@@ -6,6 +6,14 @@ MCP server to interact with Quran.com corpus via the official [REST API v4](http
 
 This is a Model Context Protocol (MCP) server generated from the [OpenAPI specification](v4.json).
 
+### ✨ Key Features
+
+- **🚀 Intelligent Caching** - Automatic caching of frequently accessed data (chapters, translations, verses) for faster responses
+- **📝 Ready-to-Use Prompts** - 8 pre-built prompts for common Quran study tasks
+- **🎯 Comprehensive API Coverage** - Full access to Quran.com v4 API endpoints
+- **🔄 Automatic Retries** - Built-in retry logic with exponential backoff for network resilience
+- **📊 Verbose Logging** - Detailed request/response logging for debugging and monitoring
+
 ## Endpoints
 
 The following endpoints from the API have been made available as tools, that LLMs can use via compatible clients.
@@ -45,6 +53,21 @@ The following endpoints from the API have been made available as tools, that LLM
 
 ### Languages
 * GET /resources/languages - Get all languages
+
+## Prompts
+
+The server includes 8 pre-built prompts for common Quran study tasks:
+
+1. **Daily Verse for Reflection** - Get a random verse with translation for daily study
+2. **Study a Surah** - Comprehensive information about a specific Surah
+3. **Search for a Topic** - Search verses related to specific topics or keywords
+4. **Compare Verse Translations** - View multiple translations side-by-side
+5. **Study a Juz** - Access verses from a specific Juz for structured reading
+6. **Get a Famous Verse** - Quick access to well-known verses (Ayat al-Kursi, etc.)
+7. **Browse Available Translations** - List all translations by language
+8. **Memorization Helper** - Get verses from specific Mushaf pages
+
+Use these prompts in Claude Desktop to quickly access common Quran study workflows.
 
 ## Setup
 
@@ -128,9 +151,29 @@ To use this MCP server with Claude Desktop, add the following configuration to y
 
 ## Environment Variables
 
-* `API_KEY`: API key for authentication
+* `API_KEY`: API key for authentication (if required by Quran.com API)
 * `PORT`: Server port (default: 8000 or 3000 depending on language)
-* `VERBOSE_MODE`: Set to 'true' to enable verbose logging of API requests and responses (default: false)
+* `VERBOSE_MODE`: Set to 'true' to enable verbose logging of API requests, responses, and cache hits (default: false)
+
+## Performance Features
+
+### Intelligent Caching
+
+The server automatically caches frequently accessed data to improve response times and reduce API calls:
+
+- **Chapters**: Cached for 1 hour (max 50 entries)
+- **Translations**: Cached for 1 hour (max 100 entries)
+- **Verses**: Cached for 1 hour (max 200 entries)
+
+Cache hits are logged when `VERBOSE_MODE` is enabled, showing the source as 'cache' along with current cache size.
+
+### Automatic Retries
+
+Network requests automatically retry up to 3 times with exponential backoff (1s, 2s, 4s) for:
+- Network failures
+- Server errors (5xx responses)
+
+This ensures reliable operation even with temporary network issues.
 
 ## Verbose Mode
 

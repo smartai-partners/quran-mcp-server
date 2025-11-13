@@ -7,24 +7,24 @@ import { ApiError } from '../types/error';
 import { verboseLog } from '../utils/logger';
 import { makeApiRequest } from './base-service';
 import { API_BASE_URL, CACHE_DURATION_MS } from '../config';
-import { 
-  translationSchema, 
-  translationInfoSchema, 
-  translationsSchema 
+import { Cache } from '../utils/cache';
+import {
+  translationSchema,
+  translationInfoSchema,
+  translationsSchema
 } from '../schemas/translations';
-import { 
-  TranslationResponse, 
-  TranslationInfoResponse, 
-  TranslationsResponse 
+import {
+  TranslationResponse,
+  TranslationInfoResponse,
+  TranslationsResponse
 } from '../types/api-responses';
 
 /**
  * Service for translation-related API operations
  */
 export class TranslationsService {
-  // Cache for translations list to avoid repeated API calls
-  private translationsCache: any = null;
-  private cacheTimestamp: number = 0;
+  // Use the improved cache utility with size limits and proper expiration
+  private translationsCache = new Cache<any>(100, CACHE_DURATION_MS);
   
   /**
    * List Translations
@@ -39,40 +39,42 @@ export class TranslationsService {
     try {
       // Validate parameters
       const validatedParams = translationsSchema.parse(params);
-      
+
+      // Generate cache key based on parameters
+      const cacheKey = `translations_${validatedParams.language || 'en'}`;
+
       // Check cache first
-      const now = Date.now();
-      if (this.translationsCache && (now - this.cacheTimestamp < CACHE_DURATION_MS)) {
+      const cachedData = this.translationsCache.get(cacheKey);
+      if (cachedData) {
         verboseLog('response', {
           method: 'listTranslations',
           source: 'cache',
-          age: `${(now - this.cacheTimestamp) / 1000} seconds`
+          cacheSize: this.translationsCache.size()
         });
-        
+
         return {
           success: true,
           message: "translations executed successfully (from cache)",
-          data: this.translationsCache
+          data: cachedData
         };
       }
-      
+
       try {
         // Make request to Quran.com API
         const url = `${API_BASE_URL}/resources/translations`;
         const response = await makeApiRequest(url, {
           language: validatedParams.language
         });
-        
+
         verboseLog('response', {
           method: 'listTranslations',
           source: 'api',
           dataSize: JSON.stringify(response).length
         });
-        
-        // Update cache
-        this.translationsCache = response;
-        this.cacheTimestamp = now;
-        
+
+        // Update cache with the new data
+        this.translationsCache.set(cacheKey, response);
+
         return {
           success: true,
           message: "translations executed successfully",
@@ -83,16 +85,16 @@ export class TranslationsService {
           method: 'listTranslations',
           error: axiosError instanceof Error ? axiosError.message : String(axiosError)
         });
-        
+
         // If the API call fails, return mock data
         verboseLog('response', {
           method: 'listTranslations',
           source: 'mock',
           reason: 'API unavailable'
         });
-        
+
         const mockData = this.getTranslationsMockData();
-        
+
         return {
           success: true,
           message: "translations executed with mock data (API unavailable)",
@@ -104,20 +106,20 @@ export class TranslationsService {
         method: 'listTranslations',
         error: error instanceof Error ? error.message : String(error)
       });
-      
+
       if (error instanceof z.ZodError) {
         throw new ApiError(`Validation error: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`, 400);
       }
-      
+
       // Return mock data as a fallback for any error
       verboseLog('response', {
         method: 'listTranslations',
         source: 'mock',
         reason: 'error occurred'
       });
-      
+
       const mockData = this.getTranslationsMockData();
-      
+
       return {
         success: true,
         message: "translations executed with mock data (error occurred)",

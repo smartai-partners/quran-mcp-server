@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { ApiError } from '../types/error';
 import { verboseLog } from '../utils/logger';
 import { makeApiRequest } from './base-service';
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL, CACHE_DURATION_MS } from '../config';
+import { Cache } from '../utils/cache';
 import {
   versesByChapterNumberSchema,
   versesByPageNumberSchema,
@@ -30,6 +31,8 @@ import {
  * Service for verse-related API operations
  */
 export class VersesService {
+  // Cache for verses to avoid repeated API calls (verse text rarely changes)
+  private versesCache = new Cache<any>(200, CACHE_DURATION_MS);
   /**
    * Get verses by chapter number
    * Get list of verses by Chapter / Surah number.
@@ -285,9 +288,31 @@ export class VersesService {
     try {
       // Validate parameters
       const validatedParams = versesByVerseKeySchema.parse(params);
-      
+
+      // Generate cache key based on parameters
+      const translationsKey = Array.isArray(validatedParams.translations)
+        ? validatedParams.translations.join(',')
+        : (validatedParams.translations || '');
+      const cacheKey = `verse_${validatedParams.verse_key}_${validatedParams.language || 'en'}_${translationsKey}`;
+
+      // Check cache first
+      const cachedData = this.versesCache.get(cacheKey);
+      if (cachedData) {
+        verboseLog('response', {
+          method: 'versesByVerseKey',
+          source: 'cache',
+          cacheSize: this.versesCache.size()
+        });
+
+        return {
+          success: true,
+          message: "verses-by_verse_key executed successfully (from cache)",
+          data: cachedData
+        };
+      }
+
       const url = `${API_BASE_URL}/verses/by_key/${validatedParams.verse_key}`;
-      
+
       // Make request to Quran.com API
       const data = await makeApiRequest(url, {
         language: validatedParams.language,
@@ -299,7 +324,10 @@ export class VersesService {
         translation_fields: validatedParams.translation_fields,
         fields: validatedParams.fields
       });
-      
+
+      // Update cache with the new data
+      this.versesCache.set(cacheKey, data);
+
       return {
         success: true,
         message: "verses-by_verse_key executed successfully",
@@ -310,11 +338,11 @@ export class VersesService {
         method: 'versesByVerseKey',
         error: error instanceof Error ? error.message : String(error)
       });
-      
+
       if (error instanceof z.ZodError) {
         throw new ApiError(`Validation error: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`, 400);
       }
-      
+
       // Re-throw other errors
       throw error;
     }
