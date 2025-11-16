@@ -69,6 +69,19 @@ The server includes 8 pre-built prompts for common Quran study tasks:
 
 Use these prompts in Claude Desktop to quickly access common Quran study workflows.
 
+## Quick Start
+
+After installation, try these commands in Claude Desktop:
+
+```
+"Show me a random verse for today's reflection"
+"I want to study Surah Al-Fatiha"
+"Find verses about patience"
+"Show me Ayat al-Kursi with multiple translations"
+```
+
+📖 **For detailed usage examples and guides, see [USAGE.md](USAGE.md)**
+
 ## Setup
 
 ### Requirements
